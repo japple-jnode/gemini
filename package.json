@@ -1,0 +1,30 @@
+{
+  "name": "@jnode/gemini",
+  "version": "1.0.0",
+  "description": "Simple Gemini API package for Node.js.",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Hello, Gemini.\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/japple-jnode/gemini.git"
+  },
+  "keywords": [
+    "JustNode",
+    "Gemini",
+    "AI",
+    "LLM",
+    "Google",
+    "JustApple"
+  ],
+  "author": "JustApple <apple@justapple.tw>",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/japple-jnode/gemini/issues"
+  },
+  "homepage": "https://github.com/japple-jnode/gemini#readme",
+  "dependencies": {
+    "@jnode/request": "1.x.x"
+  }
+}
