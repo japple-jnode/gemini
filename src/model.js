@@ -123,15 +123,16 @@ class GeminiModel {
 					}
 					
 					const role = isUser ? 'user' : 'model';
-					const lastItem = result[result.length - 1];
+					let lastItem = result[result.length - 1];
 					if (lastItem && ((lastItem.role === role) || ((lastItem.role === 'function') && isUser))) { //if same role, push to single content
-						lastItem.parts.push(...parts);
+						result[result.length - 1] = { ...lastItem };
+						result[result.length - 1].parts = [ ...(result[result.length - 1].parts), ...parts ];
 					} else { //new content
 						result.push({ role, parts });
 					}
 				} else if (typeof i === 'object') { //orginal api content format
 					result.push(i);
-					isUser = i.role === 'user';
+					isUser = i.role !== 'model';
 				}
 				isUser = !isUser;
 			}
