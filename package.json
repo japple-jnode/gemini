@@ -1,6 +1,6 @@
 {
   "name": "@jnode/gemini",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Simple Gemini API package for Node.js.",
   "main": "src/index.js",
   "scripts": {
@@ -25,6 +25,6 @@
   },
   "homepage": "https://github.com/japple-jnode/gemini#readme",
   "dependencies": {
-    "@jnode/request": ">=1.0.4 <2.0.0"
+    "@jnode/request": ">=1.1.2 <2.0.0"
   }
 }

@@ -14,6 +14,9 @@ const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
 
+//load jnode packages
+const request = require('@jnode/request');
+
 //load supported mime type
 supportMimeTypes = require('./mime.json');
 
@@ -74,66 +77,41 @@ class GeminiFileManager {
 			//set smart display name
 			displayName = displayName ?? this.getSmartName(file, isWebFile, fileMtime);
 			
-			//first request: provide file info
-			https.request(this.client.apiUrl('/upload/v1beta/files'),{
-				method: 'POST',
-				headers: { //put length and type in headers
-					'X-Goog-Upload-Protocol': 'resumable',
-					'X-Goog-Upload-Command': 'start',
-					'X-Goog-Upload-Header-Content-Length': fileSize,
-					'X-Goog-Upload-Header-Content-Type': fileType,
-					'Content-Type': 'application/json',
+			//make a multipart request
+			const res = await request.multipartRequest('POST', this.client.apiUrl('/upload/v1beta/files'), {
+				'X-Goog-Upload-Protocol': 'multipart',
+				'X-Goog-Upload-Header-Content-Length': fileSize,
+				'X-Goog-Upload-Header-Content-Type': fileType,
+				'Content-Type': 'application/json',
+			}, [
+				{
+					type: 'application/json; charset=utf-8',
+					data: JSON.stringify({ file: { displayName: displayName} })
+				},
+				{
+					type: fileType,
+					stream: fileStream
 				}
-			}, (res) => { //handle response
-				let body = '';
-				res.on('data', (chunk) => { body += chunk; }); //receive response body
-				res.on('end', () => {
-					if (res.statusCode !== 200) { //api responded with error
-						let err = new Error(`Gemini API responded with code ${res.statusCode}.`);
-						err.headers = res.headers; //provide headers
-						err.body = body; //provide body
-						reject(err);
-						return;
-					}
-					
-					//second request: actrually send file data
-					const req = https.request(res.headers['x-goog-upload-url'], {
-						method: 'POST',
-						headers: { //put length in headers
-							'Content-Length': fileSize,
-							'X-Goog-Upload-Offset': '0',
-							'X-Goog-Upload-Command': 'upload, finalize'
-						}
-					}, (res) => {
-						let body = '';
-						res.on('data', (chunk) => { body += chunk; }); //receive response body
-						
-						res.on('end', async () => {
-							if (res.statusCode !== 200) { //api responded with error
-								let err = new Error(`Gemini API responded with code ${res.statusCode}.`);
-								err.headers = res.headers; //provide headers
-								err.body = body; //provide body
-								reject(err);
-								return;
-							}
-							
-							let result = JSON.parse(body).file;
-							
-							for (let i = 0; (i < this.client.fileMaxActiveCheck && result.state !== 'ACTIVE'); i++) { //check file status until is active
-								result = (await this.client.apiRequest('GET', `/v1beta/${result.name}`)).json();
-								await new Promise((resolve) => {
-									setTimeout(resolve, this.client.fileActiveCheckDelay);
-								});
-							}
-							
-							resolve(result); //return result
-						});
-					});
-					
-					fileStream.pipe(req); //pipe read stream
+			]);
+			
+			if (res.statusCode !== 200) { //api responded with error
+				let err = new Error(`Gemini API responded with code ${res.statusCode}.`);
+				err.headers = res.headers; //provide headers
+				err.body = res.body; //provide body
+				reject(err);
+				return;
+			}
+			
+			let result = res.json().file;
+			
+			for (let i = 0; (i < this.client.fileMaxActiveCheck && result.state !== 'ACTIVE'); i++) { //check file status until is active
+				result = (await this.client.apiRequest('GET', `/v1beta/${result.name}`)).json();
+				await new Promise((resolve) => {
+					setTimeout(resolve, this.client.fileActiveCheckDelay);
 				});
-				
-			}).end(JSON.stringify({ file: { displayName: displayName} }));
+			}
+			
+			resolve(result); //return result
 		});
 	}
 	
@@ -176,7 +154,7 @@ class GeminiFileManager {
 			try {
 				fileStat = await fs.promises.stat(file); //get file info
 			} catch (err) {
-				reject(new Error(`Fail to read file "${file}".`)); //could not get file
+				throw new Error(`Fail to read file "${file}".`); //could not get file
 			}
 			
 			//set file mtime

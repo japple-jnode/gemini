@@ -23,15 +23,15 @@ class GeminiContents {
 		this.options.contents = this.contents;
 		
 		this.res = await this.model.apiRequest('POST', 'generateContent', this.options); //make an request
-		this.candidate = (this.res.json.candidates ?? [{
+		this.candidate = (this.res.json().candidates ?? [{
 			content: { parts: [], role: 'model' },
 			finishReason: 'EMPTY' //somtimes gemini may provide empty response
 		}])[0];
 		this.content = this.candidate.content;
 		this.contents.push(this.content); //push to full contents
 		this.parts = (this.candidate.content ?? { parts: [] }).parts; //message parts
-		this.usage = this.res.json.usageMetadata;
-		this.feedback = this.res.json.promptFeedback;
+		this.usage = this.res.json().usageMetadata;
+		this.feedback = this.res.json().promptFeedback;
 		this.status = this.candidate.finishReason;
 		
 		//handle function call and pure text
