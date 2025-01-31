@@ -53,8 +53,8 @@ class GeminiClient {
 			'Content-Type': (body !== undefined) ? 'application/json' : null
 		}, (body !== undefined) ? JSON.stringify(body) : undefined); //make an request
 		
-		if (((res.code > 299) || (res.code < 200)) && this.apiThrowError) { //throw error if not 2xx
-			throw new GeminiAPIError(res.code, res.json() ?? res.text(), res.headers);
+		if (((res.statusCode > 299) || (res.statusCode < 200)) && this.apiThrowError) { //throw error if not 2xx
+			throw new GeminiAPIError(res.statusCode, res.json() ?? res.text(), res.headers);
 		}
 		
 		return res;
