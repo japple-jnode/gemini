@@ -98,14 +98,24 @@ class GeminiModel {
 							} else if (j.filePath) { //local file
 								let file = await this.client.fileManager.getSmartFile(j.filePath, false); //check file is uploaded
 								if (!file) { //if not, upload file
-									file = await this.client.fileManager.uploadFile(j.filePath, false);
+									try {
+										file = await this.client.fileManager.uploadFile(j.filePath, false);
+									} catch (err) { //when file is unsupport
+										if (this.client.fileUnsupportError) throw err;
+										continue;
+									}
 								}
 								
 								parts.push({ fileData: { fileUri: file.uri } }); //push file
 							} else if (j.fileUrl) { //web files
 								let file = await this.client.fileManager.getSmartFile(j.fileUrl, true); //check file is uploaded
 								if (!file) { //if not, upload file
-									file = await this.client.fileManager.uploadFile(j.fileUrl, true);
+									try {
+										file = await this.client.fileManager.uploadFile(j.fileUrl, true);
+									} catch (err) { //when file is unsupport
+										if (this.client.fileUnsupportError) throw err;
+										continue;
+									}
 								}
 								
 								parts.push({ fileData: { fileUri: file.uri } }); //push file

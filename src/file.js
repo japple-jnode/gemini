@@ -18,7 +18,8 @@ const crypto = require('crypto');
 const request = require('@jnode/request');
 
 //load supported mime type
-supportMimeTypes = require('./mime.json');
+const supportMimeTypes = require('./mime.json');
+const mimeTypesArray = Object.values(supportMimeTypes);
 
 //Gemini file manager
 class GeminiFileManager {
@@ -48,6 +49,12 @@ class GeminiFileManager {
 							return;
 						};
 						
+						//check unsupport file type and throw error
+						if (!mimeTypesArray.includes(res.headers['content-type'] ?? 'text/plain')) {
+							reject(new Error(`Unsupported file MIME type: ${fileType}.`));
+							return;
+						}
+						
 						//set file info and read stream
 						fileType = res.headers['content-type'] ?? 'text/plain';
 						fileSize = res.headers['content-length'] ?? null;
@@ -67,6 +74,12 @@ class GeminiFileManager {
 					reject(new Error(`Fail to read file "${file}".`)); //could not get file
 				}
 				
+				//check unsupport file type and throw error
+				if (!mimeTypesArray.includes(supportMimeTypes[path.extname(file)] ?? 'text/plain')) {
+					reject(new Error(`Unsupported file MIME type: ${fileType}.`));
+					return;
+				}
+				
 				//set file info and read stream
 				fileType = supportMimeTypes[path.extname(file)] ?? 'text/plain';
 				fileSize = fileStat.size ?? null;
@@ -81,8 +94,7 @@ class GeminiFileManager {
 			const res = await request.multipartRequest('POST', this.client.apiUrl('/upload/v1beta/files'), {
 				'X-Goog-Upload-Protocol': 'multipart',
 				'X-Goog-Upload-Header-Content-Length': fileSize,
-				'X-Goog-Upload-Header-Content-Type': fileType,
-				'Content-Type': 'application/json',
+				'X-Goog-Upload-Header-Content-Type': fileType
 			}, [
 				{
 					type: 'application/json; charset=utf-8',

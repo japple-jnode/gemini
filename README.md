@@ -42,6 +42,7 @@ new gemini.Client(key, options = {})
 - `options`: An optional object for setting various client options:
   - `apiBase`: The base URL of the Gemini API. Default is `generativelanguage.googleapis.com`.
   - `apiThrowError`: Whether to throw errors when the API status code is not 2xx. Default is `true`.
+  - `fileUnsupportError`: Whether to throw errors when the file type is not supported. Default is `true`.
   - `fileActiveCheckDelay`: Delay in milliseconds between file status checks. Default is `1500`.
   - `fileMaxActiveCheck`: Maximum number of file status checks. Default is `15`.
 

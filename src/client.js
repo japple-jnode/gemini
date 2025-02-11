@@ -32,7 +32,8 @@ class GeminiClient {
 		
 		//client api options
 		this.apiBase = options.apiBase ?? 'generativelanguage.googleapis.com';
-		this.apiThrowError = options.apiThrowError ?? true; //throw error while api status code is not 2xx
+		this.apiThrowError = options.apiThrowError ?? true; //throw error when api status code is not 2xx
+		this.fileUnsupportError = options.fileUnsupportError ?? true; //throw error when file format is not supported
 		
 		//file manager
 		this.fileManager = new GeminiFileManager(this);
