@@ -89,6 +89,7 @@ class GeminiModel {
 					
 					for (let j of i) {
 						if (typeof j === 'string') { //text
+							if (j.trim().length === 0) continue; //ignore empty string
 							parts.push({ text: j });
 						} else if (typeof j === 'boolean') { //boolean, set role
 							isUser = j;
@@ -135,6 +136,9 @@ class GeminiModel {
 							}
 						}
 					}
+					
+					//ignore empty content
+					if (parts.length === 0) continue;
 					
 					const role = isUser ? 'user' : 'model';
 					let lastItem = result[result.length - 1];
