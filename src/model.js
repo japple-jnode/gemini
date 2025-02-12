@@ -96,14 +96,16 @@ class GeminiModel {
 							if (j.text) { //text
 								parts.push({ text: j });
 							} else if (j.filePath) { //local file
-								let file = await this.client.fileManager.getSmartFile(j.filePath, false); //check file is uploaded
-								if (!file) { //if not, upload file
-									try {
+								let file;
+								
+								try {
+									file = await this.client.fileManager.getSmartFile(j.filePath, false); //check file is uploaded
+									if (!file) { //if not, upload file
 										file = await this.client.fileManager.uploadFile(j.filePath, false);
-									} catch (err) { //when file is unsupport
-										if (this.client.fileUnsupportError) throw err;
-										continue;
 									}
+								} catch (err) { //when file is unsupport
+									if (this.client.fileUnsupportError) throw err;
+									continue;
 								}
 								
 								parts.push({ fileData: { fileUri: file.uri } }); //push file
