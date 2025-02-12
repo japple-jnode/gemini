@@ -52,7 +52,7 @@ class GeminiFileManager {
 						//check unsupport file type and throw error
 						if (!mimeTypesArray.includes(res.headers['content-type'] ?? 'text/plain')) {
 							res.destroy(); //destory connect
-							reject(new Error(`Unsupported file MIME type: ${fileType}.`));
+							reject(new Error(`Unsupported file MIME type: ${res.headers['content-type']}.`));
 							return;
 						}
 						
@@ -77,7 +77,7 @@ class GeminiFileManager {
 				
 				//check unsupport file type and throw error
 				if (!mimeTypesArray.includes(supportMimeTypes[path.extname(file)] ?? 'text/plain')) {
-					reject(new Error(`Unsupported file MIME type: ${fileType}.`));
+					reject(new Error(`Unsupported file MIME type: ${supportMimeTypes[path.extname(file)]}.`));
 					return;
 				}
 				
@@ -155,7 +155,7 @@ class GeminiFileManager {
 					//check unsupport file type and throw error
 					if (!mimeTypesArray.includes(res.headers['content-type'] ?? 'text/plain')) {
 						res.destroy(); //destory connect
-						reject(new Error(`Unsupported file MIME type: ${fileType}.`));
+						reject(new Error(`Unsupported file MIME type: ${res.headers['content-type']}.`));
 						return;
 					}
 					
