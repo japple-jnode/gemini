@@ -110,14 +110,16 @@ class GeminiModel {
 								
 								parts.push({ fileData: { fileUri: file.uri } }); //push file
 							} else if (j.fileUrl) { //web files
-								let file = await this.client.fileManager.getSmartFile(j.fileUrl, true); //check file is uploaded
-								if (!file) { //if not, upload file
-									try {
+								let file;
+								
+								try {
+									file = await this.client.fileManager.getSmartFile(j.fileUrl, true); //check file is uploaded
+									if (!file) { //if not, upload file
 										file = await this.client.fileManager.uploadFile(j.fileUrl, true);
-									} catch (err) { //when file is unsupport
-										if (this.client.fileUnsupportError) throw err;
-										continue;
 									}
+								} catch (err) { //when file is unsupport
+									if (this.client.fileUnsupportError) throw err;
+									continue;
 								}
 								
 								parts.push({ fileData: { fileUri: file.uri } }); //push file
