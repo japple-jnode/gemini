@@ -74,7 +74,7 @@ class GeminiModel {
 	}
 	
 	//change simple content(s) to api format
-	async contentToApiFormat(content) {
+	async contentToApiFormat(content, keyOverwrite) {
 		let result = [];
 		let isUser = true;
 		
@@ -100,9 +100,9 @@ class GeminiModel {
 								let file;
 								
 								try {
-									file = await this.client.fileManager.getSmartFile(j.filePath, false); //check file is uploaded
+									file = await this.client.fileManager.getSmartFile(j.filePath, false, keyOverwrite); //check file is uploaded
 									if (!file) { //if not, upload file
-										file = await this.client.fileManager.uploadFile(j.filePath, false);
+										file = await this.client.fileManager.uploadFile(j.filePath, false, keyOverwrite);
 									}
 								} catch (err) { //when file is unsupport
 									if (this.client.fileUnsupportError) throw err;
@@ -114,9 +114,9 @@ class GeminiModel {
 								let file;
 								
 								try {
-									file = await this.client.fileManager.getSmartFile(j.fileUrl, true); //check file is uploaded
+									file = await this.client.fileManager.getSmartFile(j.fileUrl, true, keyOverwrite); //check file is uploaded
 									if (!file) { //if not, upload file
-										file = await this.client.fileManager.uploadFile(j.fileUrl, true);
+										file = await this.client.fileManager.uploadFile(j.fileUrl, true, keyOverwrite);
 									}
 								} catch (err) { //when file is unsupport
 									if (this.client.fileUnsupportError) throw err;
@@ -160,13 +160,13 @@ class GeminiModel {
 	}
 	
 	//make an request to Gemini API with this model
-	apiRequest(method, action, body) {
-		return this.client.apiRequest(method, `/v1beta/models/${this.model}${(action ? `:${action}` : '')}`, null, body);
+	apiRequest(method, action, body, keyOverwrite) {
+		return this.client.apiRequest(method, `/v1beta/models/${this.model}${(action ? `:${action}` : '')}`, null, body, keyOverwrite);
 	}
 	
 	//generate content with simple format and simple output
-	generate(content, optionsOverwrite = {}) {
-		return (new GeminiContents(this)).generate(content, optionsOverwrite);
+	generate(content, optionsOverwrite = {}, keyOverwrite) {
+		return (new GeminiContents(this)).generate(content, optionsOverwrite, keyOverwrite);
 	}
 }
 

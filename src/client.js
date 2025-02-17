@@ -44,13 +44,13 @@ class GeminiClient {
 	}
 	
 	//get full api url with base, path and key
-	apiUrl(path = '/', query = '') {
-		return `https://${this.apiBase}${path}?key=${this.key}${(query ? `&${query}` : '')}`;
+	apiUrl(path = '/', query = '', keyOverwrite = this.key) {
+		return `https://${this.apiBase}${path}?key=${keyOverwrite}${(query ? `&${query}` : '')}`;
 	}
 	
 	//make an request to Gemini API
-	async apiRequest(method = 'GET', path = '/', query = '', body) {
-		const res = await request.request(method, this.apiUrl(path), {
+	async apiRequest(method = 'GET', path = '/', query = '', body, keyOverwrite) {
+		const res = await request.request(method, this.apiUrl(path, undefined, keyOverwrite), {
 			'Content-Type': (body !== undefined) ? 'application/json' : null
 		}, (body !== undefined) ? JSON.stringify(body) : undefined); //make an request
 		

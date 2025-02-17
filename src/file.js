@@ -29,7 +29,7 @@ class GeminiFileManager {
 	}
 	
 	//upload local file or web file to gemini api with smart handling
-	uploadFile(file, isWebFile = false, displayName) {
+	uploadFile(file, isWebFile = false, displayName, keyOverwrite) {
 		return new Promise(async (resolve, reject) => {
 			let fileSize; //file bytes
 			let fileType = 'text/plain'; //file mime type
@@ -92,7 +92,7 @@ class GeminiFileManager {
 			displayName = displayName ?? this.getSmartName(file, isWebFile, fileMtime);
 			
 			//make a multipart request
-			const res = await request.multipartRequest('POST', this.client.apiUrl('/upload/v1beta/files'), {
+			const res = await request.multipartRequest('POST', this.client.apiUrl('/upload/v1beta/files', null, keyOverwrite), {
 				'X-Goog-Upload-Protocol': 'multipart',
 				'X-Goog-Upload-Header-Content-Length': fileSize,
 				'X-Goog-Upload-Header-Content-Type': fileType
@@ -118,7 +118,7 @@ class GeminiFileManager {
 			let result = res.json().file;
 			
 			for (let i = 0; (i < this.client.fileMaxActiveCheck && result.state !== 'ACTIVE'); i++) { //check file status until is active
-				result = (await this.client.apiRequest('GET', `/v1beta/${result.name}`)).json();
+				result = (await this.client.apiRequest('GET', `/v1beta/${result.name}`, undefined, undefined, keyOverwrite)).json();
 				await new Promise((resolve) => {
 					setTimeout(resolve, this.client.fileActiveCheckDelay);
 				});
@@ -128,16 +128,16 @@ class GeminiFileManager {
 		});
 	}
 	
-	async getFilesList() {
-		this.filesCache = (await this.client.apiRequest('GET', '/v1beta/files', 'pageSize=100')).json().files ?? [];
+	async getFilesList(keyOverwrite) {
+		this.filesCache = (await this.client.apiRequest('GET', '/v1beta/files', 'pageSize=100', undefined, keyOverwrite)).json().files ?? [];
 		return this.filesCache;
 	}
 	
-	apiDeleteFile(file) {
-		return this.client.apiRequest('DELETE', `/v1beta/${file}`);
+	apiDeleteFile(file, keyOverwrite) {
+		return this.client.apiRequest('DELETE', `/v1beta/${file}`, undefined, undefined, keyOverwrite);
 	}
 	
-	async getSmartFile(file, isWebFile = false) {
+	async getSmartFile(file, isWebFile = false, keyOverwrite) {
 		let fileMtime = 0; //file modify time
 		
 		if (isWebFile) { //handle files from internet (http/https)
@@ -182,7 +182,7 @@ class GeminiFileManager {
 		}
 		
 		const displayName = this.getSmartName(file, isWebFile, fileMtime);
-		await this.getFilesList(); //update files list
+		await this.getFilesList(keyOverwrite); //update files list
 		return this.filesCache.find((e) => e.displayName === displayName);
 	}
 	

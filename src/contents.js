@@ -15,14 +15,14 @@ class GeminiContents {
 	}
 	
 	//generate content with simple format and simple output
-	async generate(content, optionsOverwrite) {
+	async generate(content, optionsOverwrite, keyOverwrite) {
 		this.optionsOverwrite = optionsOverwrite ?? this.optionsOverwrite ?? {};
 		this.simpleOptions = { ...(this.model.options), ...(this.optionsOverwrite) }; //overwrite and format
 		this.options = this.model.optionsToApiFormat(this.simpleOptions); //overwrite and format
 		this.contents = this.contents.concat(await this.model.contentToApiFormat(content)); //push contents
 		this.options.contents = this.contents;
 		
-		this.res = await this.model.apiRequest('POST', 'generateContent', this.options); //make an request
+		this.res = await this.model.apiRequest('POST', 'generateContent', this.options, keyOverwrite); //make an request
 		this.candidate = (this.res.json().candidates ?? [{
 			content: { parts: [], role: 'model' },
 			finishReason: 'EMPTY' //somtimes gemini may provide empty response
@@ -54,7 +54,7 @@ class GeminiContents {
 	}
 	
 	//run functions with extra data and continue generate
-	async runFunctions(extraData) {
+	async runFunctions(extraData, optionsOverwrite, keyOverwrite) {
 		this.functionResponseParts = [];
 		
 		for (let i of (this.functionCalls ?? [])) { //run every function with await
@@ -67,7 +67,7 @@ class GeminiContents {
 			});
 		}
 		
-		return this.generate([{ role: 'function', parts: this.functionResponseParts }]);
+		return this.generate([{ role: 'function', parts: this.functionResponseParts }], optionsOverwrite, keyOverwrite);
 	}
 }
 
