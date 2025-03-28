@@ -62,6 +62,11 @@ class GeminiModel {
 			result.generationConfig.responseSchema = options.jsonMode;
 		}
 		
+		//image generate
+		if (options.imageGenerate === true) {
+			result.generationConfig.responseModalities = [ 'image', 'text' ];
+		}
+		
 		//other options
 		if (options.stopSequences) result.generationConfig.stopSequences = options.stopSequences;
 		if (options.candidateCount) result.generationConfig.candidateCount = options.candidateCount;

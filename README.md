@@ -87,6 +87,7 @@ new gemini.Model(client, model, options = {})
   - `safetySettings`: Safety settings for the model.
   - `systemInstruction`: System instruction text.
   - `jsonMode`: Enable JSON mode (boolean or object with response schema).
+  - `jsonMode`: Enable image generate (boolean).
   - `stopSequences`: Stop sequences for generation.
   - `candidateCount`: Number of candidate responses.
   - `maxOutputTokens`: Maximum number of output tokens.
@@ -168,6 +169,7 @@ new gemini.Contents(model, contents)
 - `usage`: Usage metadata.
 - `feedback`: Prompt feedback.
 - `status`: Finish reason.
+- `attachments`: An array of inline data respond by model.
 
 ## Class: `GeminiFileManager`
 

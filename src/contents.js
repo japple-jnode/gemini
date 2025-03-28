@@ -34,9 +34,10 @@ class GeminiContents {
 		this.feedback = this.res.json().promptFeedback;
 		this.status = this.candidate.finishReason;
 		
-		//handle function call and pure text
+		//handle function call, pure text and attachments
 		this.text = '';
 		this.functionCalls = [];
+		this.attachments = [];
 		for (let i in this.parts) {
 			if (this.parts[i].text) { //pure text
 				this.text += this.parts[i].text;
@@ -47,6 +48,8 @@ class GeminiContents {
 					function: this.simpleOptions.functions.find(e => e.name === this.parts[i].functionCall.name),
 					partIndex: i
 				});
+			} else if (this.parts[i].inlineData) {
+				this.attachments.push(this.parts[i].inlineData);
 			}
 		}
 		
