@@ -36,11 +36,16 @@ class GeminiContents {
 		
 		//handle function call, pure text and attachments
 		this.text = '';
+		this.thought = '';
 		this.functionCalls = [];
 		this.attachments = [];
 		for (let i in this.parts) {
 			if (this.parts[i].text) { //pure text
-				this.text += this.parts[i].text;
+				if (this.parts[i].thought) {
+					this.thought += this.parts[i].text;
+				} else {
+					this.text += this.parts[i].text;
+				}
 			} else if (this.parts[i].functionCall) { //push function call
 				this.functionCalls.push({
 					name: this.parts[i].functionCall.name,

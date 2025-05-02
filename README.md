@@ -94,6 +94,8 @@ new gemini.Model(client, model, options = {})
   - `temperature`: Temperature for generation.
   - `topP`: Top-p value for generation.
   - `topK`: Top-k value for generation.
+  - `generationConfig`: Overwrite the config with original format.
+  - `imageGenerate`: Boolean. Use image generate.
 
 ### Methods
 

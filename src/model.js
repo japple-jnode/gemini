@@ -75,6 +75,9 @@ class GeminiModel {
 		if (options.topP) result.generationConfig.topP = options.topP;
 		if (options.topK) result.generationConfig.topK = options.topK;
 		
+		//any options
+		Object.assign(result.generationConfig, options.generationConfig ?? {});
+		
 		return result;
 	}
 	
